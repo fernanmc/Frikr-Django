@@ -10,6 +10,16 @@ from  django.contrib.auth.decorators import login_required
 from django.db.models import  Q
 # Create your views here.
 
+class  PhotosQueryset(object):
+    def get_photos_queryset(self,request):
+        if not request.user.is_authenticated():
+            photos = Photo.objects.filter(visibility=PUBLIC)
+        elif request.user.is_superuser:
+            photos = Photo.objects.all()
+        else:
+            photos = Photo.objects.filter(Q(owner=request.user) | Q(visibility=PUBLIC))
+        return photos
+
 class HomeView(View):
     def get(self, request):
         photos = Photo.objects.filter(visibility=PUBLIC).order_by('-created_at')
@@ -23,7 +33,7 @@ class HomeView(View):
         return render(request,'photos/home.html',context)
 
 
-class DetailView(View):
+class DetailView(View, PhotosQueryset):
     def get(self, request, pk):
         """
         Carga la pagina de detalle de una foto
@@ -31,7 +41,7 @@ class DetailView(View):
         :param pk: id de la foto
         :return: HttpResponse
         """
-        possible_photos = Photo.objects.filter(pk=pk).select_related('owner')  #utilizar pk siempre va a buscar por el valor que sea clave primaria
+        possible_photos = self.get_photos_queryset(request).filter(pk=pk).select_related('owner')  #utilizar pk siempre va a buscar por el valor que sea clave primaria
         if len(possible_photos) == 1:
             photo = possible_photos[0]
         else:
@@ -84,7 +94,7 @@ class CreateView(View):
         }
         return render(request, 'photos/new.html', context)
 
-class ListView(View):
+class ListView(View, PhotosQueryset):
 
     def __get__(self, request):
         """
@@ -92,13 +102,7 @@ class ListView(View):
         :param request:
         :return:
         """
-        if not request.user.is_authenticated():
-            photos = Photo.objects.filter(visibility=PUBLIC)
-        elif request.user.is_superuser:
-            photos  = Photo.objects.all()
-        else:
-            photos = Photo.objects.filter(Q(owner=request.user)| Q(visibility=PUBLIC))
         context = {
-            'photos': photos
+            'photos': self.get_photos_queryset(request)
         }
         return render(request, 'photos/photos_list.html', context)
