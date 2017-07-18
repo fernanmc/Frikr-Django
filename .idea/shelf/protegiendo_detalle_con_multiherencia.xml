@@ -1,0 +1,9 @@
+<changelist name="protegiendo_detalle_con_multiherencia" date="1500405952333" recycled="false">
+  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/protegiendo_detalle_con_multiherencia/shelved.patch" />
+  <option name="DESCRIPTION" value="protegiendo detalle con multiherencia" />
+  <binary>
+    <option name="BEFORE_PATH" value="db.sqlite3" />
+    <option name="AFTER_PATH" value="db.sqlite3" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/protegiendo_detalle_con_multiherencia/db.sqlite3" />
+  </binary>
+</changelist>
